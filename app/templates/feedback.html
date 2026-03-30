@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Recent Feedback</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Recent Feedback</h2>
+        <ul>
+            {% for f in feedbacks %}
+            <li><strong>{{ f['name'] }}:</strong> {{ f['message'] }}</li>
+            {% endfor %}
+        </ul>
+        <br>
+        <a href="{{ url_for('index') }}">Submit More Feedback</a>
+    </div>
+</body>
+
+</html>
