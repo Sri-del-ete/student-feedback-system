@@ -1,42 +1,41 @@
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
-import database
+from database import init_db
 
 app = Flask(__name__)
 
 # Initialize the database when the app starts
-database.init_db()
+init_db()
 
+# Helper function to connect to the database
 def get_db_connection():
     conn = sqlite3.connect('feedback.db')
-    conn.row_factory = sqlite3.Row
+    conn.row_factory = sqlite3.Row  # This lets us access columns by name
     return conn
 
-# Route for the main page where users submit feedback
-@app.route('/', methods=('GET', 'POST'))
+@app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
+        # Get the data from the HTML form
         name = request.form['name']
         message = request.form['message']
         
-        # Save to database
-        conn = get_db_connection()
-        conn.execute('INSERT INTO feedback (name, message) VALUES (?, ?)', (name, message))
-        conn.commit()
-        conn.close()
-        return redirect(url_for('feedback')) # Redirect to see the feedback
+        # Save it to the database
+        if name and message:
+            conn = get_db_connection()
+            conn.execute('INSERT INTO feedback (name, message) VALUES (?, ?)', (name, message))
+            conn.commit()
+            conn.close()
+            # Refresh the page to show the new feedback
+            return redirect(url_for('index'))
     
-    return render_template('index.html')
-
-# Route to display all submitted feedback
-@app.route('/feedback')
-def feedback():
+    # If it's a GET request (just loading the page), fetch all existing feedback
     conn = get_db_connection()
-    # Fetch all feedback entries
     feedbacks = conn.execute('SELECT * FROM feedback ORDER BY id DESC').fetchall()
     conn.close()
-    return render_template('feedback.html', feedbacks=feedbacks)
+    
+    # Pass the feedback to the HTML template
+    return render_template('index.html', feedbacks=feedbacks)
 
 if __name__ == '__main__':
-    # Run the app on port 5000
     app.run(host='0.0.0.0', port=5000)
