@@ -21,8 +21,8 @@ pipeline {
         stage('Deploy Stage') {
             steps {
                 echo 'Triggering Ansible Deployment...'
-                // Jenkins tells WSL (Linux) to run your Ansible playbook
-                bat 'wsl ansible-playbook -i ansible/inventory ansible/deploy.yml'
+                // Using the absolute path to force Jenkins to find WSL
+                bat 'C:\\Windows\\System32\\wsl.exe ansible-playbook -i ansible/inventory ansible/deploy.yml'
             }
         }
     }
