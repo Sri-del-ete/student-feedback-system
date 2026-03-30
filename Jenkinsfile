@@ -18,6 +18,14 @@ pipeline {
             }
         }
 
+        stage('Test Stage') {
+            steps {
+                echo 'Running automated tests...'
+                // Spin up a temporary container just to run the test script
+                bat 'docker run --rm student-feedback-app python -m unittest test_app.py'
+            }
+        }
+
         stage('Deploy Stage') {
             steps {
                 echo 'Deploying directly via Docker...'
