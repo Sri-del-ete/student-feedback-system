@@ -20,9 +20,13 @@ pipeline {
 
         stage('Deploy Stage') {
             steps {
-                echo 'Triggering Ansible Deployment...'
-                // Using the absolute path to force Jenkins to find WSL
-                bat 'C:\\Windows\\System32\\wsl.exe ansible-playbook -i ansible/inventory ansible/deploy.yml'
+                echo 'Deploying directly via Docker...'
+                // Stop the old container if it exists
+                bat 'docker stop student-feedback-container || exit 0'
+                // Remove the old container if it exists
+                bat 'docker rm student-feedback-container || exit 0'
+                // Run the new container
+                bat 'docker run -d --name student-feedback-container -p 5000:5000 student-feedback-app'
             }
         }
     }
